@@ -20,13 +20,10 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.uix.image import Image
 from kivymd.uix.filemanager import MDFileManager
-from kivy.uix.popup import Popup
 Bucket_Name = "insurence-management-s3-project"
 s3_client = boto3.client('s3', aws_access_key_id="AKIA6E6I24PMFYM3NRPD", aws_secret_access_key="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")
 conn = pymysql.connect(host="insurencemanagementrds.cwhayzj5qrw4.us-east-1.rds.amazonaws.com", user="admin", password="admin123", db="SnowRemovalApp")
 cursor = conn.cursor()
-
-
 
 screen_helper = """
 #: import get_color_from_hex kivy.utils.get_color_from_hex
@@ -673,11 +670,6 @@ class AddLocationScreen(Screen):
         self.ids.state_spinner.text = ''
         self.ids.location_picture.source = ''
         self.ids.city_spinner.text = ''
-
-    def selected(self, selection):
-        self.ids.location_picture.source = selection[0]
-        self.ids.location_picture.opacity = 1
-        toast("Location Picture Selected")
 
 class ViewLocationScreen(Screen):
 
