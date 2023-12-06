@@ -657,15 +657,29 @@ class AddLocationScreen(Screen):
         self.ids.city_spinner.text = ''
 
     def location_button(self):
-        if platform == "android":
-            request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-        from plyer import filechooser
-        filechooser.open_file(on_selection=self.selected)
+    # Request the READ_EXTERNAL_STORAGE permission
+    self.request_permissions()
 
+    # Open file chooser after permission is granted
+    filechooser.open_file(on_selection=self.selected)
+
+    def request_permissions(self):
+        if platform() == 'android':
+            permissions = [
+                Permission.READ_EXTERNAL_STORAGE,
+                Permission.WRITE_EXTERNAL_STORAGE,
+            ]
+            request_permissions(permissions)
+            Logger.info("Requested permissions: {}".format(permissions))
+    
     def selected(self, selection):
-        self.ids.location_picture.source = selection[0]
-        self.ids.location_picture.opacity = 1
-        toast("Location Picture Selected")
+        try:
+            image_path = selection[0]
+            self.ids.location_picture.source = image_path
+            self.ids.location_picture.opacity = 1
+            toast("Location Picture Selected")
+        except Exception as e:
+            print(f"Error loading image: {e}")
 
 class ViewLocationScreen(Screen):
 
