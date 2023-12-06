@@ -4,7 +4,6 @@ from kivy.metrics import dp,sp
 from kivy.utils import get_color_from_hex
 from kivy.uix.gridlayout import GridLayout
 import boto3
-from kivymd.uix.textfield import MDTextField
 from kivy.clock import Clock
 import pymysql
 from kivy.uix.image import AsyncImage
@@ -16,21 +15,18 @@ from kivymd.uix.button import  MDRectangleFlatButton, MDFloatingActionButton , M
 from kivymd.uix.label import MDLabel
 from screen_nav import screen_helper
 from kivy.properties import ObjectProperty
-from kivy.core.window import Window
-from kivy.graphics import Rectangle, Line, Color
+from kivy.graphics import Rectangle
 from kivymd.uix.card import MDCard
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.uix.image import Image
-from kivy import platform
-from android.permissions import Permission, request_permissions
+from kivymd.uix.filemanager import MDFileManager
+from kivy.uix.popup import Popup
 Bucket_Name = "insurence-management-s3-project"
 s3_client = boto3.client('s3', aws_access_key_id="AKIA6E6I24PMFYM3NRPD", aws_secret_access_key="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")
 conn = pymysql.connect(host="insurencemanagementrds.cwhayzj5qrw4.us-east-1.rds.amazonaws.com", user="admin", password="admin123", db="SnowRemovalApp")
 cursor = conn.cursor()
 
-if platform == "android":
-    from android.permissions import Permission, request_permissions
-    request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+
 
 screen_helper = """
 #: import get_color_from_hex kivy.utils.get_color_from_hex
@@ -605,6 +601,26 @@ class AddLocationScreen(Screen):
     location_name = ObjectProperty(None)
     zip_code = ObjectProperty(None)
 
+    def __init__(self, **kwargs):
+        super(AddLocationScreen, self).__init__(**kwargs)
+        self.file_manager = MDFileManager(
+            exit_manager=self.exit_manager,
+            select_path=self.select_path,
+        )
+
+    def exit_manager(self, *args):
+        self.file_manager.close()
+
+    def select_path(self, path):
+        self.exit_manager()
+        toast(f"Selected: {path}")
+        self.ids.location_picture.source = path
+        self.ids.location_picture.opacity = 1
+        toast("Location Picture Selected")
+
+    def location_button(self):
+        self.file_manager.show('/')
+
     def update_city_spinner(self, selected_state):
         state_city_mapping = {
             "New Hampshire": ["Pittsburg"],
@@ -657,10 +673,6 @@ class AddLocationScreen(Screen):
         self.ids.state_spinner.text = ''
         self.ids.location_picture.source = ''
         self.ids.city_spinner.text = ''
-
-    def location_button(self):
-        from plyer import filechooser
-        filechooser.open_file(on_selection=self.selected)
 
     def selected(self, selection):
         self.ids.location_picture.source = selection[0]
