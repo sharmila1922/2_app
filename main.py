@@ -28,7 +28,9 @@ s3_client = boto3.client('s3', aws_access_key_id="AKIA6E6I24PMFYM3NRPD", aws_sec
 conn = pymysql.connect(host="insurencemanagementrds.cwhayzj5qrw4.us-east-1.rds.amazonaws.com", user="admin", password="admin123", db="SnowRemovalApp")
 cursor = conn.cursor()
 
-
+if platform == "android":
+    from android.permissions import Permission, request_permissions
+    request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
 
 screen_helper = """
 #: import get_color_from_hex kivy.utils.get_color_from_hex
@@ -657,29 +659,13 @@ class AddLocationScreen(Screen):
         self.ids.city_spinner.text = ''
 
     def location_button(self):
-    # Request the READ_EXTERNAL_STORAGE permission
-    self.request_permissions()
+        from plyer import filechooser
+        filechooser.open_file(on_selection=self.selected)
 
-    # Open file chooser after permission is granted
-    filechooser.open_file(on_selection=self.selected)
-
-    def request_permissions(self):
-        if platform() == 'android':
-            permissions = [
-                Permission.READ_EXTERNAL_STORAGE,
-                Permission.WRITE_EXTERNAL_STORAGE,
-            ]
-            request_permissions(permissions)
-            Logger.info("Requested permissions: {}".format(permissions))
-    
     def selected(self, selection):
-        try:
-            image_path = selection[0]
-            self.ids.location_picture.source = image_path
-            self.ids.location_picture.opacity = 1
-            toast("Location Picture Selected")
-        except Exception as e:
-            print(f"Error loading image: {e}")
+        self.ids.location_picture.source = selection[0]
+        self.ids.location_picture.opacity = 1
+        toast("Location Picture Selected")
 
 class ViewLocationScreen(Screen):
 
